@@ -2,6 +2,7 @@
 
 from pydantic import BaseModel
 from pymongo import MongoClient
+from pymongo.results import InsertOneResult, UpdateResult, DeleteResult
 from castor_lib.core.logging import get_logger
 from castor_lib.core.models import ActivityLog, \
         Agent, Attachment, Check, Client, Command, \
@@ -73,11 +74,12 @@ class CastorDatabase():
         self.client.close()
         self.logger.debug('Disconnected from the database')
 
-    def _insert(self, collection: str, document: dict) -> None:
+    def _insert(self, collection: str, document: dict) -> InsertOneResult:
         """Insert a document into a collection."""
         self.logger.debug(f'Inserting document into {collection}')
-        self.db[collection].insert_one(document)
+        result = self.db[collection].insert_one(document)
         self.logger.debug(f'Document inserted into {collection}')
+        return result
 
     def _find(self, collection: str, query: dict) -> list[dict]:
         """Find documents in a collection."""
@@ -86,17 +88,19 @@ class CastorDatabase():
         self.logger.debug(f'Found {len(documents)} documents in {collection}')
         return documents
 
-    def _update(self, collection: str, query: dict, update: dict) -> None:
+    def _update(self, collection: str, query: dict, update: dict) -> UpdateResult:
         """Update documents in a collection."""
         self.logger.debug(f'Updating documents in {collection}')
-        self.db[collection].update_many(query, update)
+        result = self.db[collection].update_many(query, update)
         self.logger.debug(f'Updated documents in {collection}')
+        return result
 
-    def _delete(self, collection: str, query: dict) -> None:
+    def _delete(self, collection: str, query: dict) -> DeleteResult:
         """Delete documents from a collection."""
         self.logger.debug(f'Deleting documents from {collection}')
-        self.db[collection].delete_many(query)
+        result = self.db[collection].delete_many(query)
         self.logger.debug(f'Deleted documents from {collection}')
+        return result
 
     def _get_collection(self, collection: str) -> list[dict]:
         """Get all documents from a collection."""
@@ -109,12 +113,13 @@ class CastorDatabase():
         collection = COLLECTION_MAP[model]
         return [model(**doc) for doc in self._get_collection(collection)]
 
-    def insert(self, model: BaseModel) -> None:
+    def insert(self, model: BaseModel) -> InsertOneResult:
         """Insert a document into the database."""
         collection = COLLECTION_MAP[model.__class__]
-        self._insert(collection, dict(model))
+        result = self._insert(collection, dict(model))
+        return result
 
-    def delete(self, model: BaseModel) -> None:
+    def delete(self, model: BaseModel) -> DeleteResult:
         """Delete a document from the database."""
         collection = COLLECTION_MAP[model.__class__]
         self._delete(collection, dict(model))
@@ -124,7 +129,7 @@ class CastorDatabase():
         collection = COLLECTION_MAP[model.__class__]
         return [model(**doc) for doc in self._find(collection, query)]
 
-    def update(self, model: BaseModel, query: dict, update: dict) -> None:
+    def update(self, model: BaseModel, query: dict, update: dict) -> UpdateResult:
         """Update documents in the database."""
         collection = COLLECTION_MAP[model.__class__]
         self._update(collection, query, update)
