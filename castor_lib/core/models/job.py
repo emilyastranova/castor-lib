@@ -50,9 +50,9 @@ class Job(BaseModel):
     end_date: Optional[datetime] = datetime.now().isoformat()
     duration: Optional[float] = 0.0
     created_by: Optional[str] = None
-    type: Optional[str] = "Manual"
+    type: Optional[str] = "automated"
     depends_on: Optional[list] = []
-    status: Optional[str] = "To Do"
+    status: Optional[str] = "pending"
     logs: Optional[dict] = {}
     exit_code: Optional[int] = None
     hostname: Optional[str] = None
