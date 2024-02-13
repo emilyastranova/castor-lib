@@ -91,7 +91,10 @@ class CastorDatabase():
     def _update(self, collection: str, query: dict, update: dict) -> UpdateResult:
         """Update documents in a collection."""
         self.logger.debug(f'Updating documents in {collection}')
-        result = self.db[collection].update_many(query, update)
+        # Received query is just the key and value that need to update
+        # So, we need to convert it to the full query with $set
+        update = {'$set': update}
+        result = self.db[collection].update_one(query, update)
         self.logger.debug(f'Updated documents in {collection}')
         return result
 
@@ -115,28 +118,29 @@ class CastorDatabase():
 
     def insert(self, model: BaseModel) -> InsertOneResult:
         """Insert a document into the database."""
-        collection = COLLECTION_MAP[model.__class__]
+        collection = COLLECTION_MAP[model]
         result = self._insert(collection, dict(model))
         return result
 
     def delete(self, model: BaseModel) -> DeleteResult:
         """Delete a document from the database."""
-        collection = COLLECTION_MAP[model.__class__]
+        collection = COLLECTION_MAP[model]
         self._delete(collection, dict(model))
 
     def find(self, model: BaseModel, query: dict) -> list[BaseModel]:
         """Find documents in the database."""
-        collection = COLLECTION_MAP[model.__class__]
+        collection = COLLECTION_MAP[model]
         return [model(**doc) for doc in self._find(collection, query)]
 
     def update(self, model: BaseModel, query: dict, update: dict) -> UpdateResult:
         """Update documents in the database."""
-        collection = COLLECTION_MAP[model.__class__]
-        self._update(collection, query, update)
+        collection = COLLECTION_MAP[model]
+        result = self._update(collection, query, update)
+        return result
 
     def get(self, model: BaseModel, query: dict) -> BaseModel:
         """Get a document from the database."""
-        collection = COLLECTION_MAP[model.__class__]
+        collection = COLLECTION_MAP[model]
         return model(**self._find(collection, query)[0])
 
     def get_by_id(self, model: BaseModel, _id: str) -> BaseModel:
