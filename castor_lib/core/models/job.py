@@ -21,6 +21,7 @@ This module contains the Pydantic models for the Job resource.
         - `stderr`: String
     - `exit_code`: Number
     - `hostname`: String
+    - `agent_id`: ObjectId (reference to Agents Collection)
     - `username`: String
     - `environment_variables`: Array of object documents
         - `name`: String
@@ -55,6 +56,7 @@ class Job(BaseModel):
     status: Optional[str] = "pending"
     logs: Optional[dict] = {}
     exit_code: Optional[int] = None
+    agent_id: Optional[str] = None
     hostname: Optional[str] = None
     username: Optional[str] = None
     environment_variables: Optional[list] = []
