@@ -113,34 +113,34 @@ class CastorDatabase():
     # class and do type casting to the model class when returning the results
     def get_collection(self, model: BaseModel) -> list[dict]:
         """Get all documents from a collection."""
-        collection = COLLECTION_MAP[type(model)]
+        collection = COLLECTION_MAP[model]
         return [model(**doc) for doc in self._get_collection(collection)]
 
-    def insert(self, model: BaseModel) -> InsertOneResult:
+    def insert(self, model: BaseModel, data: BaseModel) -> InsertOneResult:
         """Insert a document into the database."""
-        collection = COLLECTION_MAP[type(model)]
-        result = self._insert(collection, dict(model))
+        collection = COLLECTION_MAP[model]
+        result = self._insert(collection, dict(data))
         return result
 
-    def delete(self, model: BaseModel) -> DeleteResult:
+    def delete(self, model: BaseModel, data: BaseModel) -> DeleteResult:
         """Delete a document from the database."""
-        collection = COLLECTION_MAP[type(model)]
-        self._delete(collection, dict(model))
+        collection = COLLECTION_MAP[model]
+        self._delete(collection, dict(data))
 
     def find(self, model: BaseModel, query: dict) -> list[BaseModel]:
         """Find documents in the database."""
-        collection = COLLECTION_MAP[type(model)]
+        collection = COLLECTION_MAP[model]
         return [model(**doc) for doc in self._find(collection, query)]
 
     def update(self, model: BaseModel, query: dict, update: dict) -> UpdateResult:
         """Update documents in the database."""
-        collection = COLLECTION_MAP[type(model)]
+        collection = COLLECTION_MAP[model]
         result = self._update(collection, query, update)
         return result
 
     def get(self, model: BaseModel, query: dict) -> BaseModel:
         """Get a document from the database."""
-        collection = COLLECTION_MAP[type(model)]
+        collection = COLLECTION_MAP[model]
         return model(**self._find(collection, query)[0])
 
     def get_by_id(self, model: BaseModel, _id: str) -> BaseModel:
