@@ -2,8 +2,10 @@
 
 This module contains the Pydantic models for the Agent resource.
     - `_id`: ObjectId
-    - `agent_name`: String
-    - `agent_type`: String (e.g., "Windows", "Linux", "Mac", "Docker", "Kubernetes")
+    - `agent_hostname`: String
+    - `agent_os`: String (e.g., "Windows", "Linux", "Mac", "Docker", "Kubernetes")
+    - `agent_websocket_id`: String
+    - `agent_username`: String
     - `agent_status`: String (e.g., "Online", "Offline", "Busy", "Idle")
     - `agent_logs`: Array of log documents
     - `agent_jobs`: Array of job documents
@@ -21,8 +23,10 @@ PyObjectId = Annotated[str, BeforeValidator(str)]
 class Agent(BaseModel):
     """Model for the Agent resource."""
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    name: str
-    type: str
+    hostname: Optional[str] = None
+    os: Optional[str] = None
+    username: Optional[str] = None
+    websocket_id: Optional[str] = None
     status: Optional[str] = "Unknown"
     logs: Optional[list] = "No logs available"
     jobs: Optional[list] = []
