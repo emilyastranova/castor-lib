@@ -28,7 +28,7 @@ class Agent(BaseModel):
     username: Optional[str] = None
     websocket_id: Optional[str] = None
     status: Optional[str] = "Unknown"
-    logs: Optional[list] = "No logs available"
+    logs: Optional[list] = []
     jobs: Optional[list] = []
     agent_tags: Optional[list] = []
     agent_preferences: Optional[list] = []
